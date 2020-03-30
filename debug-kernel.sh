@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# This script helped to trace back a bug to a specific kernel commit. Some
+# kernel commit broke a wifi driver without descriptive error message.
+# This script performs all necessary steps, except booting the kernel. This
+# makes the process bearable.
+
 set -euo pipefail
 
 DEVICE_NAME=wlx283b82cb5705
