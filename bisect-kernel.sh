@@ -71,8 +71,7 @@ yes "" | make -C "$KERNEL_DIR" $MAKE_VERBOSITY localmodconfig || true
 #     --enable CONFIG_CFG80211 \
 #     --enable CONFIG_USB
 
-N_PROCS=$(grep -Ec "^processor[[:space:]]+:" /proc/cpuinfo)
 # shellcheck disable=SC2086
-make -C "$KERNEL_DIR" -j "$N_PROCS" $MAKE_VERBOSITY dir-pkg
+make -C "$KERNEL_DIR" -j "$(nproc)" $MAKE_VERBOSITY dir-pkg
 # shellcheck disable=SC2086
-make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" -j "$N_PROCS" $MAKE_VERBOSITY
+make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" -j "$(nproc)" $MAKE_VERBOSITY
