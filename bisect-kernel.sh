@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2086
 
-set -euo pipefail
+set -eu
 
 
 function print_usage() {
@@ -63,7 +63,7 @@ cp "$(find /boot -maxdepth 1 -iname "config-5.10.0-*" | sort -n | tail -n1)" "$K
     --disable SYSTEM_TRUSTED_KEYS \
     --enable OF_OVERLAY
 # Disable SC2086 because MAKE_VERBOSITY must expand to nothing if verbose is given
-yes "" | make -C "$KERNEL_DIR" $MAKE_VERBOSITY localmodconfig || true
+yes "" | make -C "$KERNEL_DIR" $MAKE_VERBOSITY localmodconfig
 # "$KERNEL_DIR/scripts/config" --file "$KERNEL_DIR/.config" \
 #     --enable CONFIG_MODULES \
 #     --enable CONFIG_WLAN \
