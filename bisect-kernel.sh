@@ -35,7 +35,7 @@ while [[ $# -gt 0 ]]
 do
     case "${1-}" in
         -h | --help) print_usage ;;
-        -v | --verbose) MAKE_VERBOSITY="" ;;
+        -v | --verbose) MAKE_VERBOSITY= ;;
         --kernel-dir)
             KERNEL_DIR="${2-}"
             shift
@@ -61,7 +61,9 @@ cp "$(find /boot -maxdepth 1 -iname "config-5.10.0-*" | sort -n | tail -n1)" "$K
 "$KERNEL_DIR/scripts/config" --file "$KCONFIG" \
     --disable SYSTEM_TRUSTED_KEYS \
     --enable OF_OVERLAY
-yes "" | make -C "$KERNEL_DIR" "$MAKE_VERBOSITY" localmodconfig || true
+# Disable SC2086 because MAKE_VERBOSITY must expand to nothing if verbose is given
+# shellcheck disable=SC2086
+yes "" | make -C "$KERNEL_DIR" $MAKE_VERBOSITY localmodconfig || true
 # "$KERNEL_DIR/scripts/config" --file "$KERNEL_DIR/.config" \
 #     --enable CONFIG_MODULES \
 #     --enable CONFIG_WLAN \
@@ -70,5 +72,7 @@ yes "" | make -C "$KERNEL_DIR" "$MAKE_VERBOSITY" localmodconfig || true
 #     --enable CONFIG_USB
 
 N_PROCS=$(grep -Ec "^processor[[:space:]]+:" /proc/cpuinfo)
-make -C "$KERNEL_DIR" -j "$N_PROCS" "$MAKE_VERBOSITY" dir-pkg
-make -C "$WIFI_DIR" KBASE="$KERNEL_DIR" -j "$N_PROCS" "$MAKE_VERBOSITY"
+# shellcheck disable=SC2086
+make -C "$KERNEL_DIR" -j "$N_PROCS" $MAKE_VERBOSITY dir-pkg
+# shellcheck disable=SC2086
+make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" -j "$N_PROCS" $MAKE_VERBOSITY
