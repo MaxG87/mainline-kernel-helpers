@@ -31,11 +31,14 @@ die() {
 }
 
 MAKE_VERBOSITY="-s"
+CLEANUP="true"
 while [[ $# -gt 0 ]]
 do
     case "${1-}" in
         -h | --help) print_usage ;;
         -v | --verbose) MAKE_VERBOSITY= ;;
+        --cleanup) CLEANUP="true" ;;
+        --no-cleanup) CLEANUP="false" ;;
         --kernel-dir)
             KERNEL_DIR="${2-}"
             shift
@@ -72,8 +75,11 @@ else
 fi
 
 # Cleanup
-make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}" clean
-make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" distclean
+if [[ "$CLEANUP" == "true" ]]
+then
+    make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}" clean
+    make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" distclean
+fi
 
 # Exit with correct code
 [[ $exit_code -eq 0 ]]
