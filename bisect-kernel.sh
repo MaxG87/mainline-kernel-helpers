@@ -57,7 +57,7 @@ fi
 KCONFIG="$KERNEL_DIR/.config"
 
 rm -f "$KCONFIG"
-cp "$(ls -1 /boot/config-5.10.0-* | sort -n | tail -n1)" "$KCONFIG"
+cp "$(find /boot -maxdepth 1 -iname "config-5.10.0-*" | sort -n | tail -n1)" "$KCONFIG"
 "$KERNEL_DIR/scripts/config" --file "$KCONFIG" \
     --disable SYSTEM_TRUSTED_KEYS \
     --enable OF_OVERLAY
