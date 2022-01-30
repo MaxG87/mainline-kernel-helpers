@@ -20,4 +20,4 @@ yes "" | make -C "$KERNEL_DIR" localmodconfig || true
 #     --enable CONFIG_USB
 
 make -C "$KERNEL_DIR" -j4 dir-pkg
-make -C "$WIFI_DIR" KBASE=/home/mgoerner/Werkbank/Hobbys/Linux-Kernel/linux -j4
+make -C "$WIFI_DIR" KBASE="$KERNEL_DIR" -j4
