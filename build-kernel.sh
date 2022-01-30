@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -euo pipefail
+set -eu
 
 if [[ ! -f README || "$(head -1 README)" != "Linux kernel" ]]
 then
