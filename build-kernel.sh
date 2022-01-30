@@ -18,7 +18,6 @@ rm -f .config
 rm -rf "../linux.orig"
 
 N_PROCS=$(grep -Ec "^processor[[:space:]]+:" /proc/cpuinfo)
-git clean -xdf
 cp "$(find /boot -maxdepth 1 -iname "config-5.10.0-*" | sort -n | tail -n1)" .config
 scripts/config --disable SYSTEM_TRUSTED_KEYS
 yes "" | make oldconfig
