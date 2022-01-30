@@ -62,14 +62,6 @@ cp "$(find /boot -maxdepth 1 -iname "config-5.10.0-*" | sort -n | tail -n1)" "$K
 "$KERNEL_DIR/scripts/config" --file "$KCONFIG" \
     --disable SYSTEM_TRUSTED_KEYS \
     --enable OF_OVERLAY
-# Disable SC2086 because MAKE_VERBOSITY must expand to nothing if verbose is given
-yes "" | make -C "$KERNEL_DIR" $MAKE_VERBOSITY localmodconfig
-# "$KERNEL_DIR/scripts/config" --file "$KERNEL_DIR/.config" \
-#     --enable CONFIG_MODULES \
-#     --enable CONFIG_WLAN \
-#     --enable CONFIG_WIRELESS \
-#     --enable CONFIG_CFG80211 \
-#     --enable CONFIG_USB
-
-make -C "$KERNEL_DIR" -j "$(nproc)" $MAKE_VERBOSITY dir-pkg
+yes "" | make -C "$KERNEL_DIR" $MAKE_VERBOSITY oldconfig
+make -C "$KERNEL_DIR" -j "$(nproc)" $MAKE_VERBOSITY prepare
 make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" -j "$(nproc)" $MAKE_VERBOSITY
