@@ -6,7 +6,7 @@ KVER="$1"
 BASE_URL="https://kernel.ubuntu.com/~kernel-ppa/mainline/v${KVER}"
 
 curl -s "${BASE_URL}/" |
-grep -A 7 'Build for amd64' |
+grep -EA 7 '(Build for amd64|Test amd64/build) succeeded' |
 grep -Eo 'linux[^"]+deb' |
 sort -u |
 grep -v lowlatency |
