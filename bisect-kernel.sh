@@ -58,11 +58,22 @@ fi
 MAKE_OPTS=(-j "$(nproc)" $MAKE_VERBOSITY)
 KCONFIG="$KERNEL_DIR/.config"
 
+# Prepare Kernel Tree
 rm -f "$KCONFIG"
-cp "$(find /boot -maxdepth 1 -iname "config-5.10.0-*" | sort -n | tail -n1)" "$KCONFIG"
-"$KERNEL_DIR/scripts/config" --file "$KCONFIG" \
-    --disable SYSTEM_TRUSTED_KEYS \
-    --enable OF_OVERLAY
-yes "" | make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" oldconfig
-make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" prepare
-make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}"
+yes "" | make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" localmodconfig > /dev/null
+make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" modules_prepare
+
+# Try to compile Wifi driver
+if make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}"
+then
+    exit_code=0
+else
+    exit_code=1
+fi
+
+# Cleanup
+make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}" clean
+make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" distclean
+
+# Exit with correct code
+[[ $exit_code -eq 0 ]]
