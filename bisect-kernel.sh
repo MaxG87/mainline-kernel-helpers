@@ -2,16 +2,66 @@
 
 set -euo pipefail
 
-KERNEL_DIR=~/Werkbank/Hobbys/Linux-Kernel/linux/
+
+function print_usage() {
+    cat <<EOF
+Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [-f] -p param_value arg1 [arg2...]
+
+Build Linux-Kernel and RTL88x2BU in conjunction.
+
+Available options:
+
+-h, --help      Print this help and exit
+-v, --verbose   Print script debug info
+--kernel-dir    Directory of the Linux Kernel source code
+--wifi-dir      Directory of the RTL88x2BU source code
+EOF
+    exit
+}
+
+msg() {
+    echo >&2 -e "${1-}"
+}
+
+die() {
+    local msg=$1
+    local code=${2-1} # default exit status 1
+    msg "$msg"
+    exit "$code"
+}
+
+MAKE_VERBOSITY="-s"
+while [[ $# -gt 0 ]]
+do
+    case "${1-}" in
+        -h | --help) print_usage ;;
+        -v | --verbose) MAKE_VERBOSITY="" ;;
+        --kernel-dir)
+            KERNEL_DIR="${2-}"
+            shift
+            ;;
+        --wifi-dir)
+            WIFI_DIR="${2-}"
+            shift
+            ;;
+        *) die "Unknown option: $1" ;;
+    esac
+    shift
+done
+
+if ! [[ ${KERNEL_DIR:+1} && ${WIFI_DIR:+1} ]]
+then
+    die "Both KERNEL_DIR and WIFI_DIR must be set!"
+fi
+
 KCONFIG="$KERNEL_DIR/.config"
-WIFI_DIR=~/Werkbank/Hobbys/rtl88x2bu
 
 rm -f "$KCONFIG"
 cp "$(ls -1 /boot/config-5.10.0-* | sort -n | tail -n1)" "$KCONFIG"
 "$KERNEL_DIR/scripts/config" --file "$KCONFIG" \
     --disable SYSTEM_TRUSTED_KEYS \
     --enable OF_OVERLAY
-yes "" | make -C "$KERNEL_DIR" localmodconfig || true
+yes "" | make -C "$KERNEL_DIR" "$MAKE_VERBOSITY" localmodconfig || true
 # "$KERNEL_DIR/scripts/config" --file "$KERNEL_DIR/.config" \
 #     --enable CONFIG_MODULES \
 #     --enable CONFIG_WLAN \
@@ -19,5 +69,6 @@ yes "" | make -C "$KERNEL_DIR" localmodconfig || true
 #     --enable CONFIG_CFG80211 \
 #     --enable CONFIG_USB
 
-make -C "$KERNEL_DIR" -j4 dir-pkg
-make -C "$WIFI_DIR" KBASE="$KERNEL_DIR" -j4
+N_PROCS=$(grep -Ec "^processor[[:space:]]+:" /proc/cpuinfo)
+make -C "$KERNEL_DIR" -j "$N_PROCS" "$MAKE_VERBOSITY" dir-pkg
+make -C "$WIFI_DIR" KBASE="$KERNEL_DIR" -j "$N_PROCS" "$MAKE_VERBOSITY"
