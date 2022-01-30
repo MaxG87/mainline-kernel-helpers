@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-if [[ $PWD != /home/mgoerner/Werkbank/Hobbys/Linux-Kernel/linux ]]
+if [[ ! -f README || "$(head -1 README)" != "Linux kernel" ]]
 then
     echo "Falsches Verzeichnis" >&2
     exit 1
