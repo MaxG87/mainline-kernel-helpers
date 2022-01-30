@@ -63,7 +63,7 @@ KCONFIG="$KERNEL_DIR/.config"
 
 # Prepare Kernel Tree
 rm -f "$KCONFIG"
-yes "" | make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" localmodconfig > /dev/null
+make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" allyesconfig > /dev/null
 make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" modules_prepare
 
 # Try to compile Wifi driver
