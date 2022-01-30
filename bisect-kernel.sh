@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2086
 
 set -eu
 
@@ -55,6 +54,8 @@ then
     die "Both KERNEL_DIR and WIFI_DIR must be set!"
 fi
 
+# shellcheck disable=SC2206
+MAKE_OPTS=(-j "$(nproc)" $MAKE_VERBOSITY)
 KCONFIG="$KERNEL_DIR/.config"
 
 rm -f "$KCONFIG"
@@ -62,6 +63,6 @@ cp "$(find /boot -maxdepth 1 -iname "config-5.10.0-*" | sort -n | tail -n1)" "$K
 "$KERNEL_DIR/scripts/config" --file "$KCONFIG" \
     --disable SYSTEM_TRUSTED_KEYS \
     --enable OF_OVERLAY
-yes "" | make -C "$KERNEL_DIR" $MAKE_VERBOSITY oldconfig
-make -C "$KERNEL_DIR" -j "$(nproc)" $MAKE_VERBOSITY prepare
-make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" -j "$(nproc)" $MAKE_VERBOSITY
+yes "" | make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" oldconfig
+make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" prepare
+make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}"
