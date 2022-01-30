@@ -13,7 +13,7 @@ then
     sudo rmmod 88x2bu
 fi
 
-rm -f ../linux-*
+rm -f ../linux-*.deb
 rm -f .config
 rm -rf "../linux.orig"
 
