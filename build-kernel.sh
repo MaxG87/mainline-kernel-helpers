@@ -8,11 +8,6 @@ then
     exit 1
 fi
 
-if sudo lsmod | grep -q 88x2bu
-then
-    sudo rmmod 88x2bu
-fi
-
 rm -f ../linux-*.deb
 rm -f .config
 rm -rf "../linux.orig"
