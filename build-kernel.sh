@@ -8,7 +8,8 @@ then
     exit 1
 fi
 
-rm -f ../linux-*.deb
+# Must remove all linux-* files. The target deb-pkg creates non-deb-files too.
+rm -f ../linux-*
 rm -f .config
 rm -rf "../linux.orig"
 
