@@ -32,6 +32,7 @@ die() {
 
 MAKE_VERBOSITY="-s"
 CLEANUP="true"
+FULL_BUILD="false"
 while [[ $# -gt 0 ]]
 do
     case "${1-}" in
@@ -43,6 +44,7 @@ do
             KERNEL_DIR="${2-}"
             shift
             ;;
+        --full-build) FULL_BUILD="true" ;;
         --wifi-dir)
             WIFI_DIR="${2-}"
             shift
@@ -63,8 +65,15 @@ KCONFIG="$KERNEL_DIR/.config"
 
 # Prepare Kernel Tree
 rm -f "$KCONFIG"
-make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" allyesconfig > /dev/null
-make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" modules_prepare
+
+if [[ "$FULL_BUILD" == "true" ]]
+then
+    yes "" | make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" localmodconfig > /dev/null
+    make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" dir-pkg
+else
+    make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" allyesconfig > /dev/null
+    make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" modules_prepare
+fi
 
 # Try to compile Wifi driver
 if make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}"
