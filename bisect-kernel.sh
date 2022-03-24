@@ -86,7 +86,7 @@ fi
 # Cleanup
 if [[ "$CLEANUP" == "true" ]]
 then
-    make  -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}" clean
+    make -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}" clean
     make -C "$KERNEL_DIR" "${MAKE_OPTS[@]}" distclean
 fi
 
