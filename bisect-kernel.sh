@@ -13,6 +13,8 @@ Available options:
 
 -h, --help      Print this help and exit
 -v, --verbose   Print script debug info
+--[no-]cleanup  Enable or disable cleanup of build artefacts; defaults to $CLEANUP
+--full-build    Enable full build of Kernel; allows to get rid of missing symbols warning
 --kernel-dir    Directory of the Linux Kernel source code
 --wifi-dir      Directory of the RTL88x2BU source code
 EOF
