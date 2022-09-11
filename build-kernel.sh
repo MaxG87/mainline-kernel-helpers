@@ -13,7 +13,9 @@ rm -f ../linux-*.{buildinfo,changes,deb,dsc,diff.gz,tar.gz}
 rm -f .config
 rm -rf "../linux.orig"
 
-cp "$(find /boot -maxdepth 1 -iname "config-5.10.0-*" | sort -n | tail -n1)" .config
+make distclean
+cp /boot/config-5.19.0-1-amd64 .config
+scripts/config --disable DEBUG_INFO
 scripts/config --disable SYSTEM_TRUSTED_KEYS
 yes "" | make oldconfig
 KCFLAGS="-march=native -O2 -pipe" KCPPFLAGS="-march=native -O2 -pipe" make -j "$(nproc)" deb-pkg
