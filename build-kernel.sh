@@ -14,7 +14,7 @@ rm -f .config
 rm -rf "../linux.orig"
 
 make distclean
-cp /boot/config-5.19.0-1-amd64 .config
+cp "$(find /boot -maxdepth 1 -type f -name 'config-[0-9].[0-9].[0-9]-[0-9]-amd64' | tail -n1)" .config
 scripts/config --disable DEBUG_INFO
 scripts/config --disable SYSTEM_TRUSTED_KEYS
 yes "" | make oldconfig
