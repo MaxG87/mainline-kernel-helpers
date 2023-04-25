@@ -15,5 +15,6 @@ rm -rf "../linux.orig"
 
 cp "$(find /boot -maxdepth 1 -type f -name 'config-[0-9].[0-9].[0-9]-[0-9]-amd64' | tail -n1)" .config
 scripts/config --disable DEBUG_INFO
-yes "" | make oldconfig
+yes "" | make -j "$(nproc)" oldconfig
+
 KCFLAGS="-march=native -O2 -pipe" KCPPFLAGS="-march=native -O2 -pipe" make -j "$(nproc)" bindeb-pkg
