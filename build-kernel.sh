@@ -13,6 +13,11 @@ function deactivate-debug-info() {
     scripts/config --set-val  DEBUG_INFO_NONE y
 }
 
+function deactivate-signing() {
+    scripts/config --disable SYSTEM_REVOCATION_KEYS
+    scripts/config --disable SYSTEM_TRUSTED_KEYS
+}
+
 if [[ ! -f README || "$(head -1 README)" != "Linux kernel" ]]
 then
     echo "Falsches Verzeichnis" >&2
@@ -28,6 +33,7 @@ PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --typ
 cp "$PREIMAGE_CONFIG" .config
 
 deactivate-debug-info
+deactivate-signing
 yes "" | make -j "$(nproc)" oldconfig
 
 KCFLAGS="-march=native -O2 -pipe" KCPPFLAGS="-march=native -O2 -pipe" make -j "$(nproc)" bindeb-pkg
