@@ -24,7 +24,8 @@ rm -f ../linux-*.{buildinfo,changes,deb,dsc,diff.gz,tar.gz}
 rm -f .config
 rm -rf "../linux.orig"
 
-cp "$(find /boot -maxdepth 1 -type f -name 'config-[0-9].[0-9].[0-9]-[0-9]-amd64' | tail -n1)" .config
+PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
+cp "$PREIMAGE_CONFIG" .config
 
 deactivate-debug-info
 yes "" | make -j "$(nproc)" oldconfig
