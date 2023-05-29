@@ -18,6 +18,16 @@ function deactivate-signing() {
     scripts/config --disable SYSTEM_TRUSTED_KEYS
 }
 
+function configure-kernel() {
+    PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
+    cp "$PREIMAGE_CONFIG" .config
+    yes "" | make -j "$(nproc)" oldconfig
+
+    deactivate-debug-info
+    deactivate-signing
+    yes "" | make -j "$(nproc)" oldconfig
+}
+
 if [[ ! -f README || "$(head -1 README)" != "Linux kernel" ]]
 then
     echo "Falsches Verzeichnis" >&2
@@ -29,11 +39,6 @@ rm -f ../linux-*.{buildinfo,changes,deb,dsc,diff.gz,tar.gz}
 rm -f .config
 rm -rf "../linux.orig"
 
-PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
-cp "$PREIMAGE_CONFIG" .config
-
-deactivate-debug-info
-deactivate-signing
-yes "" | make -j "$(nproc)" oldconfig
+configure-kernel
 
 KCFLAGS="-march=native -O2 -pipe" KCPPFLAGS="-march=native -O2 -pipe" make -j "$(nproc)" bindeb-pkg
