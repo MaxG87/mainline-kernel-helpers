@@ -53,6 +53,15 @@ function extract-extra-version-number() {
     fi
 }
 
+function set-extra-version-number() {
+    local ncommits="$1"
+    if [[ -z "$ncommits" ]]
+    then
+        return
+    fi
+    perl -pi -e 's/(^EXTRAVERSION =.*)/$1-'"$ncommits"'/' Makefile
+}
+
 function configure-kernel() {
     local PREIMAGE_CONFIG
     PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
