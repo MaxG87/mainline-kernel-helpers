@@ -4,6 +4,42 @@ set -eu
 BUILDTARGET_DEFAULT=bindeb-pkg
 CONFIGTARGET_DEFAULT=oldconfig
 
+function main() {
+    local ncommits
+
+    cleanup
+    parse-cli "$@"
+    ncommits=$(extract-extra-version-number)
+    set-extra-version-number "$ncommits"
+    configure-kernel
+    KCFLAGS="-march=native -O2 -pipe" \
+        KCPPFLAGS="-march=native -O2 -pipe" \
+        make -j "$(nproc)" "$MAKE_VERBOSITY" "$BUILDTARGET"
+}
+
+function parse-cli() {
+    BUILDTARGET="$BUILDTARGET_DEFAULT"
+    CONFIGTARGET="$CONFIGTARGET_DEFAULT"
+    MAKE_VERBOSITY="-s"
+    while [[ $# -gt 0 ]]
+    do
+        case "${1-}" in
+            -h | --help) print_usage ;;
+            -v | --verbose) MAKE_VERBOSITY= ;;
+            --build-target)
+                BUILDTARGET="${2-}"
+                shift
+                ;;
+            --config-target)
+                CONFIGTARGET="${2-}"
+                shift
+                ;;
+            *) die "Unknown option: $1" ;;
+        esac
+        shift
+    done
+}
+
 function print_usage() {
     cat <<EOF
 Usage: $(basename "${BASH_SOURCE[0]}") [-h] [-v] [--config-target] [--build-target]
@@ -88,39 +124,10 @@ function deactivate-signing() {
     scripts/config --disable SYSTEM_TRUSTED_KEYS
 }
 
-
-BUILDTARGET="$BUILDTARGET_DEFAULT"
-CONFIGTARGET="$CONFIGTARGET_DEFAULT"
-MAKE_VERBOSITY="-s"
-while [[ $# -gt 0 ]]
-do
-    case "${1-}" in
-        -h | --help) print_usage ;;
-        -v | --verbose) MAKE_VERBOSITY= ;;
-        --build-target)
-            BUILDTARGET="${2-}"
-            shift
-            ;;
-        --config-target)
-            CONFIGTARGET="${2-}"
-            shift
-            ;;
-        *) die "Unknown option: $1" ;;
-    esac
-    shift
-done
-
-
-
 if [[ ! -f README || "$(head -1 README)" != "Linux kernel" ]]
 then
     echo "Falsches Verzeichnis" >&2
     exit 1
 fi
 
-cleanup
-configure-kernel
-
-KCFLAGS="-march=native -O2 -pipe" \
-    KCPPFLAGS="-march=native -O2 -pipe" \
-    make -j "$(nproc)" "$MAKE_VERBOSITY" "$BUILDTARGET"
+main "$@"
