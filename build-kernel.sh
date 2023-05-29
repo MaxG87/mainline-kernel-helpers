@@ -7,7 +7,7 @@ CONFIGTARGET_DEFAULT=oldconfig
 function main() {
     local ncommits
 
-    cleanup
+    # cleanup
     parse-cli "$@"
     ncommits=$(extract-extra-version-number)
     set-extra-version-number "$ncommits"
