@@ -2,6 +2,7 @@
 
 set -eu
 
+CLEANUP_DEFAULT="true"
 
 function print_usage() {
     cat <<EOF
@@ -13,7 +14,7 @@ Available options:
 
 -h, --help      Print this help and exit
 -v, --verbose   Print script debug info
---[no-]cleanup  Enable or disable cleanup of build artefacts; defaults to $CLEANUP
+--[no-]cleanup  Enable or disable cleanup of build artefacts; defaults to $CLEANUP_DEFAULT
 --full-build    Enable full build of Kernel; allows to get rid of missing symbols warning
 --kernel-dir    Directory of the Linux Kernel source code
 --wifi-dir      Directory of the RTL88x2BU source code
@@ -33,7 +34,7 @@ die() {
 }
 
 MAKE_VERBOSITY="-s"
-CLEANUP="true"
+CLEANUP=$CLEANUP_DEFAULT
 FULL_BUILD="false"
 while [[ $# -gt 0 ]]
 do
