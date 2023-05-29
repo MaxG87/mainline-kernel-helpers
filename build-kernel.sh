@@ -11,6 +11,7 @@ function main() {
     parse-cli "$@"
     ncommits=$(extract-extra-version-number)
     set-extra-version-number "$ncommits"
+    append-buildinfo
     configure-kernel
     KCFLAGS="-march=native -O2 -pipe" \
         KCPPFLAGS="-march=native -O2 -pipe" \
@@ -92,6 +93,10 @@ function set-extra-version-number() {
         return
     fi
     perl -pi -e 's/(^EXTRAVERSION =.*)/$1-'"$ncommits"'/' Makefile
+}
+
+function append-buildinfo() {
+    perl -pi -e 's/(^EXTRAVERSION =.*)/$1-'"${BUILDTARGET}-${CONFIGTARGET}"'/' Makefile
 }
 
 function configure-kernel() {
