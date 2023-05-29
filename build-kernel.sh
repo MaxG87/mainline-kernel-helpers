@@ -24,6 +24,16 @@ EOF
     exit
 }
 
+function configure-kernel() {
+    local PREIMAGE_CONFIG
+    PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
+    cp "$PREIMAGE_CONFIG" .config
+    yes "" | make -j "$(nproc)" "$MAKE_VERBOSITY" "$CONFIGTARGET"
+
+    deactivate-debug-info
+    deactivate-signing
+    yes "" | make -j "$(nproc)" "$MAKE_VERBOSITY" "$CONFIGTARGET"
+}
 
 function deactivate-debug-info() {
     scripts/config --undefine DEBUG_INFO
@@ -41,16 +51,6 @@ function deactivate-signing() {
     scripts/config --disable SYSTEM_TRUSTED_KEYS
 }
 
-function configure-kernel() {
-    local PREIMAGE_CONFIG
-    PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
-    cp "$PREIMAGE_CONFIG" .config
-    yes "" | make -j "$(nproc)" "$MAKE_VERBOSITY" "$CONFIGTARGET"
-
-    deactivate-debug-info
-    deactivate-signing
-    yes "" | make -j "$(nproc)" "$MAKE_VERBOSITY" "$CONFIGTARGET"
-}
 
 BUILDTARGET="$BUILDTARGET_DEFAULT"
 CONFIGTARGET="$CONFIGTARGET_DEFAULT"
