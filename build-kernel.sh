@@ -31,6 +31,28 @@ function cleanup() {
     rm -rf "../linux.orig"
 }
 
+function extract-extra-version-number() {
+    local rc_tag_prefix="^v[[:digit:]]\.[[:digit:]]+-rc[[:digit:]]"
+    local version_tag_prefix="^v[[:digit:]]\.[[:digit:]]+\.[[:digit:]]+"
+    local version_or_rc="(${version_tag_prefix}|${rc_tag_prefix})\$"
+    local inbetween_suffix="-[[:digit:]]+-g[0-9a-f]+\$"
+    local inbetween_rc="${rc_tag_prefix}${inbetween_suffix}"
+    local inbetween_version="${version_tag_prefix}${inbetween_suffix}"
+
+    local vnum
+    vnum="$(git describe)"
+    if [[ "$vnum" =~ $version_or_rc ]]
+    then
+        echo ""
+    elif [[ "$vnum" =~ $inbetween_version ]]
+    then
+        echo "$vnum" | cut -f2 -d-
+    elif [[ "$vnum" =~ $inbetween_rc ]]
+    then
+        echo "$vnum" | cut -f3 -d-
+    fi
+}
+
 function configure-kernel() {
     local PREIMAGE_CONFIG
     PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
