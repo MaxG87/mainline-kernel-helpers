@@ -14,18 +14,16 @@ function main() {
     configure-kernel
     KCFLAGS="-march=native -O2 -pipe" \
         KCPPFLAGS="-march=native -O2 -pipe" \
-        make -j "$(nproc)" "$MAKE_VERBOSITY" "$BUILDTARGET"
+        make -j "$(nproc)" "$BUILDTARGET"
 }
 
 function parse-cli() {
     BUILDTARGET="$BUILDTARGET_DEFAULT"
     CONFIGTARGET="$CONFIGTARGET_DEFAULT"
-    MAKE_VERBOSITY="-s"
     while [[ $# -gt 0 ]]
     do
         case "${1-}" in
             -h | --help) print_usage ;;
-            -v | --verbose) MAKE_VERBOSITY= ;;
             --build-target)
                 BUILDTARGET="${2-}"
                 shift
@@ -53,7 +51,6 @@ could be started in the configuration phase already.
 Available options:
 
 -h, --help       Print this help and exit
--v, --verbose    Print script debug info
 --build-target   Compilation target. Will be passed through to \`make\`. Defaults to "$BUILDTARGET_DEFAULT".
 --config-target  Configuration target. Will be passed through to \`make\`. Defaults to "$CONFIGTARGET_DEFAULT".
 EOF
@@ -101,11 +98,11 @@ function configure-kernel() {
     local PREIMAGE_CONFIG
     PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
     cp "$PREIMAGE_CONFIG" .config
-    yes "" | make -j "$(nproc)" "$MAKE_VERBOSITY" "$CONFIGTARGET"
+    yes "" | make -j "$(nproc)" "$CONFIGTARGET"
 
     deactivate-debug-info
     deactivate-signing
-    yes "" | make -j "$(nproc)" "$MAKE_VERBOSITY" "$CONFIGTARGET"
+    yes "" | make -j "$(nproc)" "$CONFIGTARGET"
 }
 
 function deactivate-debug-info() {
