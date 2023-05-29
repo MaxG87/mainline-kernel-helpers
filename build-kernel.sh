@@ -42,13 +42,14 @@ function deactivate-signing() {
 }
 
 function configure-kernel() {
+    local PREIMAGE_CONFIG
     PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
     cp "$PREIMAGE_CONFIG" .config
-    yes "" | make -j "$(nproc)" oldconfig
+    yes "" | make -j "$(nproc)" "$MAKE_VERBOSITY" "$CONFIGTARGET"
 
     deactivate-debug-info
     deactivate-signing
-    yes "" | make -j "$(nproc)" oldconfig
+    yes "" | make -j "$(nproc)" "$MAKE_VERBOSITY" "$CONFIGTARGET"
 }
 
 BUILDTARGET="$BUILDTARGET_DEFAULT"
@@ -87,4 +88,6 @@ rm -rf "../linux.orig"
 
 configure-kernel
 
-KCFLAGS="-march=native -O2 -pipe" KCPPFLAGS="-march=native -O2 -pipe" make -j "$(nproc)" bindeb-pkg
+KCFLAGS="-march=native -O2 -pipe" \
+    KCPPFLAGS="-march=native -O2 -pipe" \
+    make -j "$(nproc)" "$MAKE_VERBOSITY" "$BUILDTARGET"
