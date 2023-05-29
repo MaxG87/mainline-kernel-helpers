@@ -24,6 +24,13 @@ EOF
     exit
 }
 
+function cleanup() {
+    # Must remove all linux-* files. The target bindeb-pkg creates non-deb-files too.
+    rm -f ../linux-*.{buildinfo,changes,deb,dsc,diff.gz,tar.gz}
+    rm -f .config
+    rm -rf "../linux.orig"
+}
+
 function configure-kernel() {
     local PREIMAGE_CONFIG
     PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
@@ -81,11 +88,7 @@ then
     exit 1
 fi
 
-# Must remove all linux-* files. The target bindeb-pkg creates non-deb-files too.
-rm -f ../linux-*.{buildinfo,changes,deb,dsc,diff.gz,tar.gz}
-rm -f .config
-rm -rf "../linux.orig"
-
+cleanup
 configure-kernel
 
 KCFLAGS="-march=native -O2 -pipe" \
