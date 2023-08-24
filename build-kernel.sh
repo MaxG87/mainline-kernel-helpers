@@ -121,6 +121,11 @@ function deactivate-signing() {
 	scripts/config --disable SYSTEM_TRUSTED_KEYS
 }
 
+function die() {
+	echo "$@" >&2
+	exit 1
+}
+
 if [[ ! -f README || "$(head -1 README)" != "Linux kernel" ]]; then
 	echo "Falsches Verzeichnis" >&2
 	exit 1
