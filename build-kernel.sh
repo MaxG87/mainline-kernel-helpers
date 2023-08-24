@@ -7,6 +7,10 @@ CONFIGTARGET_DEFAULT=oldconfig
 function main() {
 	local ncommits
 
+	if git diff | grep -q EXTRAVERSION; then
+		die "EXTRAVERSION is dirty. Please commit or stash your changes."
+	fi
+
 	# cleanup
 	parse-cli "$@"
 	ncommits=$(extract-extra-version-number)
