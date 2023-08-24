@@ -127,8 +127,7 @@ function die() {
 }
 
 if [[ ! -f README || "$(head -1 README)" != "Linux kernel" ]]; then
-	echo "Falsches Verzeichnis" >&2
-	exit 1
+	die "Falsches Verzeichnis"
 fi
 
 main "$@"
