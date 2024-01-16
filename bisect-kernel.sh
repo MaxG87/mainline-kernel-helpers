@@ -76,11 +76,17 @@ else
 fi
 
 # Try to compile Wifi driver
-if make -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}"; then
-	exit_code=0
-else
+build_log=$(mktemp)
+make -C "$WIFI_DIR" KBASE="$KERNEL_DIR" "${MAKE_OPTS[@]}" |& tee "$build_log" || true
+if grep -qE "Werror|error:" "$build_log"; then
+	# Unfortunately, the exit code of `make` is always 1 due to missing
+	# symbols. Therefore, we have to grep the output. If "error" appears in the
+	# output, the build failed.
 	exit_code=1
+else
+	exit_code=0
 fi
+rm "$build_log"
 
 # Cleanup
 if [[ "$CLEANUP" == "true" ]]; then
