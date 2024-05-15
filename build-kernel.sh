@@ -100,7 +100,8 @@ function append-buildinfo() {
 
 function configure-kernel() {
 	local PREIMAGE_CONFIG
-	PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-\d+-.*' /boot --max-depth=1 --type f | sort | tail -n1)"
+	# Expected: config-6.7.12-amd64
+	PREIMAGE_CONFIG="$(fdfind 'config-\d\.\d+\.\d+-amd64' /boot --max-depth=1 --type f | sort | tail -n1)"
 	cp "$PREIMAGE_CONFIG" .config
 	yes "" | make -j "$(nproc)" "$CONFIGTARGET"
 
