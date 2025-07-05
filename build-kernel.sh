@@ -112,7 +112,7 @@ function configure-kernel() {
 
 function get-preimage-config() {
     local config
-    config="$(fdfind 'config-\d\.\d+\.\d+-(amd64|\d+-generic)' /boot --max-depth=1 --type f | sort | tail -n1)"
+    config="$(fdfind 'config-\d\.\d+\.\d+(\+deb\d+)?-(amd64|\d+-generic)' /boot --max-depth=1 --type f | sort | tail -n1)"
     if [[ -z "$config" ]]; then
         die "Keine passende Kernelkonfiguration gefunden!"
     fi
